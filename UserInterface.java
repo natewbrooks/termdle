@@ -1,12 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class UserInterface {
-	
-	private Termdle game;
-	
-	public UserInterface(Termdle termdle) {
-		this.game = termdle;
+
+	private Panel p = new Panel();
+
+	public UserInterface() {
 		createGUI();
 	}
 	
@@ -14,10 +14,14 @@ public class UserInterface {
 		JFrame frame = new JFrame("Termdle");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		frame.add(new Panel());
+		frame.add(p);
 		
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public Panel GetPanel() {
+		return p;
 	}
 }
 
@@ -39,30 +43,51 @@ class Panel extends JPanel {
 	}
 	
 	public void drawBoxes(Graphics g) {
-		for(int j = 1; j <= 5; j++) {
-			for(int i = 1; i <= 5; i++) {
-				g.fillRect(i*55,j*55,50,50);
-				g.setColor(Color.BLACK);
+		for(int j = 0; j < 5; j++) {
+			for(int i = 0; i < 5; i++) {
+				g.setColor(Termdle.boardColors[j][i]);
+				g.fillRect((i+1)*55,(j+1)*55,50,50);
+
+				// g.setColor(Color.WHITE);
+				// g.setFont(new Font("TimesRoman", Font.PLAIN, 35));
+				// g.drawString("Y", (i+1)*65, (j+1)*90);
 			}
 		}
 	}
 	
-	// public void checkCorrectLetters(String guess) {
-	// 	for(int i = 1; i <= 5; i+) {
-	// 		String letter = guess.substring(i,i+1);
-	// 		g.fillRect(i*55, Termdle.guessCount*55, 50, 50);
-			
-	// 		if(letter.equals(Termdle.wordToGuess.substring(i,i+1)) {
-	// 			//set box to green
-	// 			g.setColor(Color.GREEN);
+	public void checkCorrectLetters(String guess) {
+
+		HashMap<Character, Integer> letterCount = new HashMap<Character, Integer>();
+
+		for(char c : Termdle.wordToGuess.toCharArray()) {
+			if(letterCount.containsKey(c)) {
+				letterCount.put(c, letterCount.get(c)+1);
+			} else {
+				letterCount.put(c, 1);
+			}
+		}
+
+		for(int i = 0; i < 5; i++) {
+			String letter = guess.substring(i,i+1);
+			char c = letter.charAt(0);
+
+			if(letter.equals(Termdle.wordToGuess.substring(i,i+1))) {
+				//set box to green
+				letterCount.put(c, letterCount.get(c)-1);
+				Termdle.boardColors[Termdle.guessCount][i] = Color.GREEN;
+			} else if (Termdle.wordToGuess.contains(letter) && letterCount.get(c) > 0) {
+				// set box to orange
+				letterCount.put(c, letterCount.get(c)-1);
+				Termdle.boardColors[Termdle.guessCount][i] = Color.ORANGE;
 				
-	// 		} else if (Termdle.wordToGuess.contains(letter)) {
-	// 			// set box to yellow
-	// 			g.setColor(Color.YELLOW);
-	// 		} else {
-	// 			g.setColor(Color.BLACK);
-	// 		}
-	// 	} 
-	// }
+			} else {
+				Termdle.boardColors[Termdle.guessCount][i] = Color.BLACK;
+			}
+		}
+		
+		this.repaint();
+	}
+
+
 }
 
