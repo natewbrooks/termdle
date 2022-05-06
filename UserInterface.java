@@ -24,6 +24,9 @@ public class UserInterface {
 class Panel extends JPanel {
 	public Panel() {
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		this.addKeyListener(new MyKeyListener());
+		this.setFocusable(true);
+		this.requestFocusInWindow();
 	}
 	
 	public Dimension getPreferredSize() {
@@ -44,27 +47,22 @@ class Panel extends JPanel {
 		}
 	}
 	
-	/*
-	public void checkCorrectLetters() {
-		for(int i = 1; i <= 5; i+) {
-			String letter = response.substring(i,i+1);
-			g.fillRect(i*55, guessCount*55, 50, 50);
+	// public void checkCorrectLetters(String guess) {
+	// 	for(int i = 1; i <= 5; i+) {
+	// 		String letter = guess.substring(i,i+1);
+	// 		g.fillRect(i*55, Termdle.guessCount*55, 50, 50);
 			
-			if(letter.equals(answer.substring(i,i+1)) {
-				//set box to green
-				g.setColor(Color.GREEN);
+	// 		if(letter.equals(Termdle.wordToGuess.substring(i,i+1)) {
+	// 			//set box to green
+	// 			g.setColor(Color.GREEN);
 				
-			} else if (answer.contains(letter)) {
-				// set box to yellow
-				g.setColor(Color.YELLOW);
-			} else {
-				g.setColor(Color.BLACK);
-			}
-		} 
-	}
-	*/
-	 
-	
-	
+	// 		} else if (Termdle.wordToGuess.contains(letter)) {
+	// 			// set box to yellow
+	// 			g.setColor(Color.YELLOW);
+	// 		} else {
+	// 			g.setColor(Color.BLACK);
+	// 		}
+	// 	} 
+	// }
 }
 

@@ -1,9 +1,9 @@
-import java.util.*;
-
-public class Main {	
+public class Main {
 	public static void main (String[] args) {
-		DataParser parser = new DataParser("answers.txt");
-		Termdle termdle = new Termdle(parser.GetAnswers());
+		DataParser answers = new DataParser("answers.txt");
+		DataParser acceptedWords = new DataParser("accepted words.txt");
+
+		new Termdle(answers.GetList(), acceptedWords.GetList());
 	}
 }
 
