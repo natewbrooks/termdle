@@ -1,0 +1,33 @@
+[WORD: SCALP]
+
+ - ADIEU
+ - ADIEU
+ - ADIEU
+ - STORY
+ - STORY
+
++-LOSS 5/5 -+
+
+
+[WORD: MOTIF]
+
+ - ADIEU
+ - ADIEU
+ - STORY
+ - STORY
+ - SWAMP
+
++-LOSS 5/5 -+
+
+
+[WORD: ABORT]
+
+ - ADIEU
+ - ADIEU
+ - ADIEU
+ - ADIEU
+ - ADIEU
+
++-LOSS 5/5-+
+
+

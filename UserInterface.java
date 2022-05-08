@@ -15,16 +15,16 @@ public class UserInterface {
 		JFrame frame = new JFrame("Termdle");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
-		frame.getContentPane().setBackground(Color.BLACK);
+		frame.getContentPane().setBackground(Termdle.backgroundColor);
 
 		JPanel board = new JPanel();
 		board.setLayout(new GridBagLayout());
-		board.setBackground(Color.BLACK);
+		board.setBackground(Termdle.backgroundColor);
 		board.setPreferredSize(new Dimension(400,300));
 
 		JPanel keyboard = new JPanel();
 		keyboard.setLayout(new GridBagLayout());
-		keyboard.setBackground(Color.BLACK);
+		keyboard.setBackground(Termdle.backgroundColor);
 		keyboard.setPreferredSize(new Dimension(500,200));
 		
 		for(int h = 0; h < Termdle.keyboardColors.keySet().size(); h++) {
@@ -60,17 +60,17 @@ public class UserInterface {
 		}
 
 		JPanel text = new JPanel();
-		text.setBackground(Color.BLACK);
+		text.setBackground(Termdle.backgroundColor);
 
 		JPanel x = new JPanel();
-		x.setBackground(Color.BLACK);
+		x.setBackground(Termdle.backgroundColor);
 
 		JLabel label = new JLabel("Termdle");
-		label.setForeground(Color.WHITE);
-		label.setFont(new Font("Serif", Font.PLAIN, 25));
+		label.setForeground(Termdle.textColor);
+		label.setFont(new Font(Termdle.fontName, Font.BOLD, 25));
 
-		streakLabel.setForeground(Color.WHITE);
-		streakLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+		streakLabel.setForeground(Termdle.textColor);
+		streakLabel.setFont(new Font(Termdle.fontName, Font.BOLD, 20));
 		
 		text.add(label);
 		x.add(streakLabel);
@@ -112,8 +112,9 @@ class Panel extends JPanel {
 	public Panel() {
 		setBorder(BorderFactory.createLineBorder(Color.WHITE));
 		setLayout(new FlowLayout());
-		x.setForeground(Color.WHITE);
-		x.setFont(new Font("Serif", Font.PLAIN, 30));
+		x.setForeground(Termdle.textColor);
+		x.setFont(new Font(Termdle.fontName, Font.BOLD, 30));
+
 		add(x,SwingConstants.CENTER);
 
 		this.addKeyListener(new MyKeyListener());
@@ -157,6 +158,13 @@ class Panel extends JPanel {
 		for(int i = 0; i < 5; i++) {
 			String letter = guess.substring(i,i+1);
 			char c = letter.charAt(0);
+			int numOfCharInGuess = 0;
+
+			for(char t : guess.toCharArray()) {
+				if(t == c) {
+					numOfCharInGuess++;
+				}
+			}
 
 			if(letter.equals(Termdle.wordToGuess.substring(i,i+1))) {
 				//set box to green
@@ -165,11 +173,27 @@ class Panel extends JPanel {
 				Termdle.keyboardColors.put(c, Termdle.correctLetterPlacementColor);
 			} else if (Termdle.wordToGuess.contains(letter) && letterCount.get(c) > 0) {
 				// set box to orange
-				letterCount.put(c, letterCount.get(c)-1);
-				Termdle.boardColors[Termdle.guessCount][i] = Termdle.correctLetterColor;
-				if(Termdle.keyboardColors.get(c) != Termdle.correctLetterPlacementColor) {
-					Termdle.keyboardColors.put(c, Termdle.correctLetterColor);
+				// check if theres a green infront
+				boolean pass = true;
+				if(numOfCharInGuess > 1 && letterCount.get(c) == 1) {
+					for(int m = i; m < 5; m++) {
+						System.out.println(guess.substring(i, i+1) + " : " + Termdle.wordToGuess.substring(m,m+1));
+						if(guess.substring(i, i+1).equals(Termdle.wordToGuess.substring(m,m+1))) {
+							numOfCharInGuess--;
+							Termdle.boardColors[Termdle.guessCount][i] = Termdle.missedLetterColor;
+							pass = false;
+						}
+					}					
 				}
+
+				if(pass) {
+					letterCount.put(c, letterCount.get(c)-1);
+					Termdle.boardColors[Termdle.guessCount][i] = Termdle.correctLetterColor;
+					if(Termdle.keyboardColors.get(c) != Termdle.correctLetterPlacementColor) {
+						Termdle.keyboardColors.put(c, Termdle.correctLetterColor);
+					}
+				}
+				
 			} else {
 				Termdle.boardColors[Termdle.guessCount][i] = Termdle.missedLetterColor;
 				Termdle.keyboardColors.put(c, Termdle.missedLetterColor);
@@ -201,8 +225,8 @@ class Key extends JPanel {
 	public Key() {
 		setBorder(BorderFactory.createLineBorder(Color.WHITE));
 		setLayout(new FlowLayout());
-		x.setForeground(Color.WHITE);
-		x.setFont(new Font("Serif", Font.PLAIN, 15));
+		x.setForeground(Termdle.textColor);
+		x.setFont(new Font(Termdle.fontName, Font.BOLD, 15));
 		add(x,SwingConstants.CENTER);
 
 		this.addKeyListener(new MyKeyListener());

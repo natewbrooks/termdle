@@ -1,5 +1,6 @@
 import java.util.*;
 import java.awt.*;
+import java.io.*;   
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -9,32 +10,32 @@ public class Termdle {
 	public static ArrayList<String> acceptedWords = new ArrayList<String>();
 
 	public static HashMap<Character, Color> keyboardColors = new HashMap<Character, Color>() {{
-		put('q', Color.BLACK);
-		put('w', Color.BLACK);
-		put('e', Color.BLACK);
-		put('r', Color.BLACK);
-		put('t', Color.BLACK);
-		put('y', Color.BLACK);
-		put('u', Color.BLACK);
-		put('i', Color.BLACK);
-		put('o', Color.BLACK);
-		put('p', Color.BLACK);
-		put('a', Color.BLACK);
-		put('s', Color.BLACK);
-		put('d', Color.BLACK);
-		put('f', Color.BLACK);
-		put('g', Color.BLACK);
-		put('h', Color.BLACK);
-		put('j', Color.BLACK);
-		put('k', Color.BLACK);
-		put('l', Color.BLACK);
-		put('z', Color.BLACK);
-		put('x', Color.BLACK);
-		put('c', Color.BLACK);
-		put('v', Color.BLACK);
-		put('b', Color.BLACK);
-		put('n', Color.BLACK);
-		put('m', Color.BLACK);
+		put('q', backgroundColor);
+		put('w', backgroundColor);
+		put('e', backgroundColor);
+		put('r', backgroundColor);
+		put('t', backgroundColor);
+		put('y', backgroundColor);
+		put('u', backgroundColor);
+		put('i', backgroundColor);
+		put('o', backgroundColor);
+		put('p', backgroundColor);
+		put('a', backgroundColor);
+		put('s', backgroundColor);
+		put('d', backgroundColor);
+		put('f', backgroundColor);
+		put('g', backgroundColor);
+		put('h', backgroundColor);
+		put('j', backgroundColor);
+		put('k', backgroundColor);
+		put('l', backgroundColor);
+		put('z', backgroundColor);
+		put('x', backgroundColor);
+		put('c', backgroundColor);
+		put('v', backgroundColor);
+		put('b', backgroundColor);
+		put('n', backgroundColor);
+		put('m', backgroundColor);
 	}};
 
 	public static String[][] boardChars = new String[5][5];
@@ -42,18 +43,23 @@ public class Termdle {
 	public static Panel[][] panels = new Panel[5][5];
 	public static Key[] keys = new Key[26];
 
-	public static Color correctLetterPlacementColor = Color.GREEN;
-	public static Color correctLetterColor = Color.ORANGE;
-	public static Color missedLetterColor = Color.DARK_GRAY;
-	public static Color notAWordColor = Color.RED;
+	public static Color correctLetterPlacementColor = new Color(54, 161, 27);
+	public static Color correctLetterColor = new Color(212, 171, 38);
+	public static Color missedLetterColor = new Color(74, 73, 71);
+	public static Color notAWordColor = new Color(128, 33, 33);
+	public static Color backgroundColor = new Color(31, 30, 28);
+	public static Color textColor = Color.WHITE;
 
+	public static String fontName = "Dotum";
 
 	public static String wordToGuess = "";
 	
 	public static String guess = "";
 	public static int guessCount = 0;
+	public static String[] pastGuesses = new String[5];
 
 	public static boolean gameOver = false;
+	public static String winState = "INGAME";
 	public static boolean errorWord = false;
 	public static int score = 0;
 	
@@ -75,7 +81,7 @@ public class Termdle {
 		// set board to black
 		for(int j = 0; j < boardColors.length; j++) {
 			for(int i = 0; i < boardColors[0].length; i++) {
-				boardColors[j][i] = Color.BLACK;
+				boardColors[j][i] = backgroundColor;
 				boardChars[j][i] = "";
 			}
 		}
@@ -88,9 +94,11 @@ public class Termdle {
 	public static void Check(KeyEvent e) {
 		if(errorWord && e.getKeyChar() == 8) {
 			for(int i = 0; i < 5; i++) {
-				Termdle.boardColors[Termdle.guessCount][i] = Color.BLACK;
+				Termdle.boardColors[Termdle.guessCount][i] = backgroundColor;
 				Termdle.panels[guessCount][i].drawBox();
 			}
+			ui.streakLabel.setForeground(Termdle.textColor);
+			ui.streakLabel.setText("Score : " + Termdle.score);
 			errorWord = false;
 		}
 		
@@ -112,15 +120,19 @@ public class Termdle {
 		if(Termdle.guess.length() == 5 && e.getKeyCode() == 10) {
 			if(Termdle.wordToGuess.equals(Termdle.guess)) {
 				// YOU WIN! WINNER WINNER!
+				Termdle.winState = "WIN";
 				Termdle.gameOver = true;
 				Termdle.score++;
+				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
 				ui.streakLabel.setText("YOU WON!! - R TO PLAY AGAIN");
 				ui.streakLabel.setForeground(correctLetterPlacementColor);
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
 				Termdle.UpdateKeyboard();
- 				// update ui to make you happy
 			} else if(Termdle.acceptedWords.contains(Termdle.guess) && Termdle.guessCount == 4) {
+				// LOSS
+				Termdle.winState = "LOSS";
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
+				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
 				ui.streakLabel.setText(Termdle.wordToGuess.toUpperCase() + " - R TO PLAY AGAIN");
 				ui.streakLabel.setForeground(Termdle.notAWordColor);
 				Termdle.gameOver = true;
@@ -129,6 +141,7 @@ public class Termdle {
 			} else if (Termdle.acceptedWords.contains(Termdle.guess) ){
 				// update ui
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
+				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
 				Termdle.guess = "";
 				Termdle.NextLine();
 				Termdle.UpdateKeyboard();
@@ -138,8 +151,9 @@ public class Termdle {
 					Termdle.boardColors[Termdle.guessCount][i] = Termdle.notAWordColor;
 					Termdle.panels[guessCount][i].drawBox();
 				}
+				ui.streakLabel.setForeground(Termdle.notAWordColor);
+				ui.streakLabel.setText("NOT AN ACCEPTED WORD");
 				errorWord = true;
-				System.out.println("That is not an accepted word!");
 			}
 		}
 
@@ -153,12 +167,14 @@ public class Termdle {
 	public static void RestartGame() {
 		boardChars = new String[5][5];
 		boardColors = new Color[5][5];
+		pastGuesses = new String[5];
 		wordToGuess = "";
 		guess = "";
 		guessCount = 0;
 		gameOver = false;
+		winState = "INGAME";
 
-		ui.streakLabel.setForeground(Color.WHITE);
+		ui.streakLabel.setForeground(textColor);
 		ui.streakLabel.setText("Score : " + score);
 		//select a random word from the list
 		int indexOfWord = (int) (Math.random() * answers.size());
@@ -170,10 +186,92 @@ public class Termdle {
 		// set board to black
 		for(int j = 0; j < boardColors.length; j++) {
 			for(int i = 0; i < boardColors[0].length; i++) {
-				boardColors[j][i] = Color.BLACK;
+				boardColors[j][i] = backgroundColor;
 				boardChars[j][i] = "";
 				panels[j][i].drawBox();
 			}
+		}
+
+		keyboardColors = new HashMap<Character, Color>() {{
+			put('q', backgroundColor);
+			put('w', backgroundColor);
+			put('e', backgroundColor);
+			put('r', backgroundColor);
+			put('t', backgroundColor);
+			put('y', backgroundColor);
+			put('u', backgroundColor);
+			put('i', backgroundColor);
+			put('o', backgroundColor);
+			put('p', backgroundColor);
+			put('a', backgroundColor);
+			put('s', backgroundColor);
+			put('d', backgroundColor);
+			put('f', backgroundColor);
+			put('g', backgroundColor);
+			put('h', backgroundColor);
+			put('j', backgroundColor);
+			put('k', backgroundColor);
+			put('l', backgroundColor);
+			put('z', backgroundColor);
+			put('x', backgroundColor);
+			put('c', backgroundColor);
+			put('v', backgroundColor);
+			put('b', backgroundColor);
+			put('n', backgroundColor);
+			put('m', backgroundColor);
+		}};
+	}
+
+	public static void PrintGameResults() {
+		try {
+			// write to last game
+			FileWriter write = new FileWriter(new File("termdle-last-game.txt"));
+			BufferedWriter writer = new BufferedWriter(write);
+			writer.write("[MOST RECENT GAME]");
+			writer.newLine();
+			writer.newLine();
+			writer.write("[WORD: " + Termdle.wordToGuess.toUpperCase() + "]");
+			writer.newLine();
+			writer.newLine();
+
+
+			for(int i = 0; i < guessCount+1; i++) {
+				writer.write(" - " + Termdle.pastGuesses[i].toUpperCase());
+				writer.newLine();
+			}
+
+			writer.newLine();
+			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/5-+");
+
+
+			writer.newLine();
+			writer.newLine();
+			writer.close();
+
+			// append to full record
+			write = new FileWriter(new File("termdle-records.txt"),true);
+			writer = new BufferedWriter(write);
+			writer.write("[WORD: " + Termdle.wordToGuess.toUpperCase() + "]");
+			writer.newLine();
+			writer.newLine();
+
+
+			for(int i = 0; i < guessCount+1; i++) {
+				writer.write(" - " + Termdle.pastGuesses[i].toUpperCase());
+				writer.newLine();
+			}
+
+			writer.newLine();
+			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/5-+");
+
+			writer.newLine();
+			writer.newLine();
+			writer.newLine();
+			writer.close();
+
+		} catch (IOException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
 		}
 	}
 }
@@ -183,6 +281,7 @@ class MyKeyListener implements KeyListener {
 		if(!Termdle.gameOver) {
 			Termdle.Check(e);
 		} else if (Termdle.gameOver && Character.toUpperCase(e.getKeyCode()) == 82) {
+			Termdle.PrintGameResults();
 			Termdle.RestartGame();
 		}
 	}
