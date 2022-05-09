@@ -38,9 +38,11 @@ public class Termdle {
 		put('m', backgroundColor);
 	}};
 
-	public static String[][] boardChars = new String[5][5];
-	public static Color[][] boardColors = new Color[5][5];
-	public static Panel[][] panels = new Panel[5][5];
+	public static int numRows = 6; // scrollbar is added for anything past 8 rows
+
+	public static String[][] boardChars = new String[numRows][5];
+	public static Color[][] boardColors = new Color[numRows][5];
+	public static Panel[][] panels = new Panel[numRows][5];
 	public static Key[] keys = new Key[26];
 
 	public static Color correctLetterPlacementColor = new Color(54, 161, 27);
@@ -53,10 +55,9 @@ public class Termdle {
 	public static String fontName = "Dotum";
 
 	public static String wordToGuess = "";
-	
 	public static String guess = "";
 	public static int guessCount = 0;
-	public static String[] pastGuesses = new String[5];
+	public static String[] pastGuesses = new String[numRows];
 
 	public static boolean gameOver = false;
 	public static String winState = "INGAME";
@@ -79,7 +80,7 @@ public class Termdle {
 		answers.remove(indexOfWord);
 
 		// set board to black
-		for(int j = 0; j < boardColors.length; j++) {
+		for(int j = 0; j < Termdle.numRows; j++) {
 			for(int i = 0; i < boardColors[0].length; i++) {
 				boardColors[j][i] = backgroundColor;
 				boardChars[j][i] = "";
@@ -124,27 +125,34 @@ public class Termdle {
 				Termdle.gameOver = true;
 				Termdle.score++;
 				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
+				Termdle.PrintGameResults();
 				ui.streakLabel.setText("YOU WON!! - R TO PLAY AGAIN");
 				ui.streakLabel.setForeground(correctLetterPlacementColor);
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
 				Termdle.UpdateKeyboard();
-			} else if(Termdle.acceptedWords.contains(Termdle.guess) && Termdle.guessCount == 4) {
+			} else if(Termdle.acceptedWords.contains(Termdle.guess) && Termdle.guessCount == Termdle.numRows-1) {
 				// LOSS
 				Termdle.winState = "LOSS";
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
 				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
+				Termdle.PrintGameResults();
 				ui.streakLabel.setText(Termdle.wordToGuess.toUpperCase() + " - R TO PLAY AGAIN");
 				ui.streakLabel.setForeground(Termdle.notAWordColor);
 				Termdle.gameOver = true;
 				Termdle.score = 0;
 				Termdle.UpdateKeyboard();
 			} else if (Termdle.acceptedWords.contains(Termdle.guess) ){
-				// update ui
+				// update panels
 				ui.GetPanel().checkCorrectLetters(Termdle.guess);
 				Termdle.pastGuesses[Termdle.guessCount] = Termdle.guess;
 				Termdle.guess = "";
 				Termdle.NextLine();
 				Termdle.UpdateKeyboard();
+
+				// scroll down a box height
+				if(Termdle.numRows > 7 && Termdle.guessCount > 5) {
+					ui.scrollPane.getVerticalScrollBar().setValue(ui.scrollPane.getVerticalScrollBar().getValue() + 60);
+				}
 			} else {
 				// shake? popup saying not a word?
 				for(int i = 0; i < 5; i++) {
@@ -165,9 +173,9 @@ public class Termdle {
 	}
 
 	public static void RestartGame() {
-		boardChars = new String[5][5];
-		boardColors = new Color[5][5];
-		pastGuesses = new String[5];
+		boardChars = new String[Termdle.numRows][5];
+		boardColors = new Color[Termdle.numRows][5];
+		pastGuesses = new String[Termdle.numRows];
 		wordToGuess = "";
 		guess = "";
 		guessCount = 0;
@@ -184,7 +192,7 @@ public class Termdle {
 		answers.remove(indexOfWord);
 
 		// set board to black
-		for(int j = 0; j < boardColors.length; j++) {
+		for(int j = 0; j < Termdle.numRows; j++) {
 			for(int i = 0; i < boardColors[0].length; i++) {
 				boardColors[j][i] = backgroundColor;
 				boardChars[j][i] = "";
@@ -241,7 +249,7 @@ public class Termdle {
 			}
 
 			writer.newLine();
-			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/5-+");
+			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/" + Termdle.numRows + "-+");
 
 
 			writer.newLine();
@@ -262,7 +270,7 @@ public class Termdle {
 			}
 
 			writer.newLine();
-			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/5-+");
+			writer.write("+-" + Termdle.winState + " " + (guessCount+1) + "/" + Termdle.numRows + "-+");
 
 			writer.newLine();
 			writer.newLine();
@@ -281,7 +289,6 @@ class MyKeyListener implements KeyListener {
 		if(!Termdle.gameOver) {
 			Termdle.Check(e);
 		} else if (Termdle.gameOver && Character.toUpperCase(e.getKeyCode()) == 82) {
-			Termdle.PrintGameResults();
 			Termdle.RestartGame();
 		}
 	}

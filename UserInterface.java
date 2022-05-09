@@ -6,6 +6,7 @@ public class UserInterface {
 
 	private Panel p = new Panel();
 	public JLabel streakLabel = new JLabel("Streak : " + Termdle.score);
+	public JScrollPane scrollPane;
 
 	public UserInterface() {
 		createGUI();
@@ -17,10 +18,16 @@ public class UserInterface {
 		frame.setLayout(new GridBagLayout());
 		frame.getContentPane().setBackground(Termdle.backgroundColor);
 
+
 		JPanel board = new JPanel();
 		board.setLayout(new GridBagLayout());
 		board.setBackground(Termdle.backgroundColor);
-		board.setPreferredSize(new Dimension(400,300));
+		board.setPreferredSize(new Dimension(300,Termdle.numRows*60));
+
+		scrollPane = new JScrollPane(board);
+		scrollPane.setPreferredSize(new Dimension(320,400));
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		scrollPane.getVerticalScrollBar().setBackground(Termdle.backgroundColor);
 
 		JPanel keyboard = new JPanel();
 		keyboard.setLayout(new GridBagLayout());
@@ -46,13 +53,15 @@ public class UserInterface {
 			keyboard.add(k,c);
 		}
 
-		for(int j = 0; j < 5; j++) {
+		for(int j = 0; j < Termdle.numRows; j++) {
 			for(int i = 0; i < 5; i ++) {
 				Panel p = new Panel();
 				GridBagConstraints c = new GridBagConstraints();
-				c.fill = GridBagConstraints.NONE;
+				c.fill = GridBagConstraints.BOTH;
 				c.gridx = i+1;
 				c.gridy = j+1;
+				c.weightx = 1;
+				c.weighty = 1;
 
 				Termdle.panels[j][i] = p;
 				board.add(p,c);
@@ -89,8 +98,12 @@ public class UserInterface {
 		cons.gridx = 5;
 		cons.gridy = 2;
 
-
-		frame.add(board, cons);
+		// if there are more than 8 rows, add a scrollbar
+		if(Termdle.numRows > 8) {
+			frame.add(scrollPane, cons);
+		} else {
+			frame.add(board, cons);
+		}
 
 		cons.gridx = 5;
 		cons.gridy = 4;
@@ -132,7 +145,7 @@ class Panel extends JPanel {
 	}
 
 	public void drawBox() {
-		for(int j = 0; j < 5; j++) {
+		for(int j = 0; j < Termdle.numRows; j++) {
 			for(int i = 0; i < 5; i++) {
 				if(Termdle.panels[j][i] == this) {
 					setBackground(Termdle.boardColors[j][i]);
